@@ -4,6 +4,7 @@ import express from 'express'
 import exitHook from 'async-exit-hook'
 import { env } from '~/config/environment'
 import { CONNECT_DB, GET_DB, CLOSE_DB } from '~/config/mongodb'
+import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware'
 import { APIs_V1 } from './routes/v1'
 // import { mapOrder } from '~/utils/sorts.js'
 
@@ -13,6 +14,9 @@ const START_SERVER = () => {
   app.use(express.json())
   app.use(express.urlencoded({ extended:true }))
   app.use('/v1', APIs_V1)
+
+  //middleware xu li loi tap trung
+  app.use(errorHandlingMiddleware)
 
   app.listen(env.APP_PORT, env.APP_HOST, () => {
     // eslint-disable-next-line no-console
