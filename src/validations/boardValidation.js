@@ -9,11 +9,12 @@ const createNew = async(req, res, next) => {
     description: Joi.string().required().min(3).max(256).trim().strict()
   })
   try {
-    console.log('req.body', req.body)
 
     // set abortEarly false de truong hop nhieu loi thi tra ve tat ca
-    await correctCondition.validateAsync(req.body, { abortEarly: false})
-    res.status(StatusCodes.CREATED).json({ message: 'post from validation: create new boards' })
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+
+    //next sang controller khi validation xong
+    next()
   } catch (error) {
     res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
       errors: new Error(error).message
