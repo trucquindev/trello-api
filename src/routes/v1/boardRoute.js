@@ -10,5 +10,7 @@ Router.route('/')
     res.status(StatusCodes.OK).json({ message: 'geted' })
   })
   .post(boardValidation.createNew, boardController.createNew)
-
+Router.route('/:id')
+  .get(boardController.getBoardDetails)
+  .put()
 export const boardRoute =Router

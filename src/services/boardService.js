@@ -1,5 +1,7 @@
 import { slugify } from '~/utils/formatterSlug'
 import { boardModel } from '~/models/boardModel'
+import ApiError from '~/utils/ApiError'
+import { StatusCodes } from 'http-status-codes'
 const createNew = async(data) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -22,7 +24,23 @@ const createNew = async(data) => {
     throw error
   }
 }
+const getBoardDetails = async(boardId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+
+    //gọi tới model để lưu newboard vào database
+    const board= await boardModel.getDetails(boardId)
+    if (!board) throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
+
+    //trả kết quả về, trong service phải return nếu không thì có như không có
+    return board
+    // return newBoard
+  } catch (error) {
+    throw error
+  }
+}
 
 export const boardService = {
-  createNew
+  createNew,
+  getBoardDetails
 }

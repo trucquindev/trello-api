@@ -12,7 +12,17 @@ const createNew = async(req, res, next) => {
     res.status(StatusCodes.CREATED).json(creatNewBoard)
   } catch (error) { next(error) }
 }
+const getBoardDetails = async(req, res, next) => {
+  try {
+    const boardId = req.params.id
+    // điều hướng dữ liệu sang service
+    const getDetails = await boardService.getBoardDetails(boardId)
 
+    // trả về kết quả thành công
+    res.status(StatusCodes.OK).json(getDetails)
+  } catch (error) { next(error) }
+}
 export const boardController = {
-  createNew
+  createNew,
+  getBoardDetails
 }
