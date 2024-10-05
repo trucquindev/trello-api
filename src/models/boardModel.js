@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { ObjectId, ReturnDocument } from 'mongodb'
+import { ObjectId } from 'mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from './validators'
 import { GET_DB } from '~/config/mongodb'
 import { BOARD_TYPE } from '~/utils/constants'
@@ -18,6 +18,8 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp('javascript').default(null),
   _destroy: Joi.boolean().default(false)
 })
+// chi dinh nhung field k muon cap nhat
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt']
 
 const createNew = async(data) => {
   try {
@@ -70,7 +72,24 @@ const pushColumnOderIds = async (dataColumn) => {
       { $push: { columnOrderIds: dataColumn._id } },
       { returnDocument:'after' }
     )
-    return result.value || null
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const updateBoard = async (boardId, updateData) => {
+  try {
+    // loc cho field tap nham khi update
+    Object.keys(updateData).forEach(fieldName => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName))
+        delete updateData[fieldName]
+    })
+    return await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(boardId) },
+      { $set: updateData },
+      { returnDocument:'after' }
+    )
   } catch (error) {
     throw new Error(error)
   }
@@ -82,5 +101,6 @@ export const boardModel= {
   createNew,
   findOneById,
   getDetails,
-  pushColumnOderIds
+  pushColumnOderIds,
+  updateBoard
 }

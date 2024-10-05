@@ -52,7 +52,7 @@ const pushCardOderIds = async (dataCard) => {
       { $push: { cardOrderIds: dataCard._id } },
       { returnDocument:'after' }
     )
-    return result.value
+    return result
   } catch (error) {
     throw new Error(error)
   }

@@ -46,8 +46,26 @@ const getBoardDetails = async(boardId) => {
     throw error
   }
 }
+const updatedBoardService = async(boardId, reqBody) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+
+    const updateData = {
+      ...reqBody,
+      updateAt: Date.now()
+    }
+    //gọi tới model để lưu newboard vào database
+    const updateBoard= await boardModel.updateBoard(boardId, updateData)
+    //trả kết quả về, trong service phải return nếu không thì có như không có
+    return updateBoard
+    // return newBoard
+  } catch (error) {
+    throw error
+  }
+}
 
 export const boardService = {
   createNew,
-  getBoardDetails
+  getBoardDetails,
+  updatedBoardService
 }
