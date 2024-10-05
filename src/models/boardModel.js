@@ -1,10 +1,10 @@
 import Joi from 'joi'
-import { ObjectId } from 'mongodb'
+import { ObjectId, ReturnDocument } from 'mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from './validators'
 import { GET_DB } from '~/config/mongodb'
 import { BOARD_TYPE } from '~/utils/constants'
 import { columnModel } from './columnModel'
-import { cardModel } from './cartModel'
+import { cardModel } from './cardModel'
 //define collection (schema and name)
 
 const BOARD_COLLECTION_NAME = 'boards'
@@ -57,7 +57,20 @@ const getDetails = async(boardId) => {
         as: 'cards'
       } }
     ]).toArray()
-    return result[0] || {}
+    return result[0] || null
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+// push column to collection in columnIds
+const pushColumnOderIds = async (dataColumn) => {
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(dataColumn.boardId) },
+      { $push: { columnOrderIds: dataColumn._id } },
+      { returnDocument:'after' }
+    )
+    return result.value || null
   } catch (error) {
     throw new Error(error)
   }
@@ -68,5 +81,6 @@ export const boardModel= {
   BOARD_COLLECTION_SCHEMA,
   createNew,
   findOneById,
-  getDetails
+  getDetails,
+  pushColumnOderIds
 }

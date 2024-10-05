@@ -33,8 +33,8 @@ const getBoardDetails = async(boardId) => {
     if (!board) throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
     const resBoard = cloneDeep(board)
     // dua card ve dung column cua no
-    resBoard.columns.forEach( column => {
-      return column.cards = resBoard.cards.filter(card => card.columnId.toString() === column._id.toString())
+    resBoard.columns?.forEach( column => {
+      return column.cards = resBoard?.cards?.filter(card => card.columnId.toString() === column._id.toString())
       // return column.cards = column.cardOrderIds.map(cardId => resBoard.cards.filter(card => card._id.toString() === cardId.toString()))
     })
     // đã bỏ card vào column nên phải xóa khỏi board
