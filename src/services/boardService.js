@@ -3,6 +3,8 @@ import { boardModel } from '~/models/boardModel'
 import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
+import { columnModel } from '~/models/columnModel'
+import { cardModel } from '~/models/cardModel'
 const createNew = async(data) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -63,9 +65,34 @@ const updatedBoardService = async(boardId, reqBody) => {
     throw error
   }
 }
+const moveCardToDifferentColumn = async(reqBody) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    //cap nhat cardOrderIds trong column ban dau
+    await columnModel.update(reqBody.prevColumnId, {
+      cardOrderIds: reqBody.prevCardOrderIds,
+      updateAt: Date.now()
+    })
+    //cap nhat cardOrderIds trong column moi
+    await columnModel.update(reqBody.nexColumnId, {
+      cardOrderIds: reqBody.nexCardOrderIds,
+      updateAt: Date.now()
+    })
+    //cap nhat columnId cua card duoc them vao column
+    await cardModel.update(reqBody.currentCardId, {
+      columnId: reqBody.nexColumnId
+    })
+    //trả kết quả về, trong service phải return nếu không thì có như không có
+    return { updateResult: 'Successfully' }
+    // return newBoard
+  } catch (error) {
+    throw error
+  }
+}
 
 export const boardService = {
   createNew,
   getBoardDetails,
-  updatedBoardService
+  updatedBoardService,
+  moveCardToDifferentColumn
 }
