@@ -51,7 +51,7 @@ const moveCardToDifferentColumn = async(req, res, next) => {
     nexColumnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     nexCardOrderIds: Joi.array().required().items(
       Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
-    ),
+    )
   })
   try {
     // set abortEarly false de truong hop nhieu loi thi tra ve tat ca
@@ -61,7 +61,7 @@ const moveCardToDifferentColumn = async(req, res, next) => {
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
   }
-} 
+}
 export const boardValidation = {
   createNew,
   updateBoard,
