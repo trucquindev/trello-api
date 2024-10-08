@@ -1,6 +1,5 @@
 
 import { StatusCodes } from 'http-status-codes'
-import ApiError from '~/utils/ApiError'
 import { columnService } from '~/services/columnService'
 const createNew = async(req, res, next) => {
   try {
@@ -22,7 +21,18 @@ const update = async(req, res, next) => {
     res.status(StatusCodes.OK).json(updatedColumn)
   } catch (error) { next(error) }
 }
+const deleteColumn = async(req, res, next) => {
+  try {
+    const columnId = req.params.id
+    // điều hướng dữ liệu sang service
+    const result = await columnService.deleteColumn(columnId)
+
+    // trả về kết quả thành công
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) { next(error) }
+}
 export const columnController = {
   createNew,
-  update
+  update,
+  deleteColumn
 }

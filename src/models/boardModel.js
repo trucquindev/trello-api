@@ -29,9 +29,9 @@ const createNew = async(data) => {
     throw new Error(error)
   }
 }
-const findOneById = async(id) => {
+const findOneById = async(boardId) => {
   try {
-    return await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({ _id: new ObjectId(id) })
+    return await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({ _id: new ObjectId(boardId) })
   } catch (error) {
     throw new Error(error)
   }
@@ -65,11 +65,13 @@ const getDetails = async(boardId) => {
   }
 }
 // push column to collection in columnIds
+// day mot phan tu columnId ra khoi mang columnOderIds
+//dung pull trong mongodb de day 1 phan tu di
 const pushColumnOderIds = async (dataColumn) => {
   try {
     const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(dataColumn.boardId) },
-      { $push: { columnOrderIds: dataColumn._id } },
+      { $push: { columnOrderIds: new ObjectId(dataColumn._id) } },
       { returnDocument:'after' }
     )
     return result
@@ -77,6 +79,22 @@ const pushColumnOderIds = async (dataColumn) => {
     throw new Error(error)
   }
 }
+
+// lay mot phan tu columnId ra khoi mang columnOderIds
+//dung pull trong mongodb de lay 1 phan tu di
+const pullColumnOderIds = async (dataColumn) => {
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(dataColumn.boardId) },
+      { $pull: { columnOrderIds: new ObjectId(dataColumn._id) } },
+      { returnDocument:'after' }
+    )
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 
 const updateBoard = async (boardId, updateData) => {
   try {
@@ -105,5 +123,6 @@ export const boardModel= {
   findOneById,
   getDetails,
   pushColumnOderIds,
-  updateBoard
+  updateBoard,
+  pullColumnOderIds
 }
