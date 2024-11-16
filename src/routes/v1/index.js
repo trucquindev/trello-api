@@ -1,19 +1,21 @@
-import express from 'express'
-import { StatusCodes } from 'http-status-codes'
-import { boardRoute } from './boardRoute'
-import { columnRoute } from './columnRoute'
-import { cardRoute } from './cardRoute'
-const Router = express.Router()
-
+import express from 'express';
+import { StatusCodes } from 'http-status-codes';
+import { boardRoute } from './boardRoute';
+import { columnRoute } from './columnRoute';
+import { cardRoute } from './cardRoute';
+import { userRoute } from './userRoute';
+const Router = express.Router();
 
 Router.get('/status', (req, res) => {
-  res.status(StatusCodes.OK).json({ massage:'Apis v1 are ready to use' })
-})
+  res.status(StatusCodes.OK).json({ massage: 'Apis v1 are ready to use' });
+});
 
-Router.use('/boards', boardRoute)
+Router.use('/boards', boardRoute);
 
-Router.use('/columns', columnRoute)
+Router.use('/columns', columnRoute);
 
-Router.use('/cards', cardRoute)
+Router.use('/cards', cardRoute);
 
-export const APIs_V1= Router
+Router.use('/users', userRoute);
+
+export const APIs_V1 = Router;
