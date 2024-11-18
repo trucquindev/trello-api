@@ -1,14 +1,25 @@
-import express from 'express'
-import { columnValidation } from '~/validations/columnValidation'
-import { columnController } from '~/controllers/columnController'
+import express from 'express';
+import { columnValidation } from '~/validations/columnValidation';
+import { columnController } from '~/controllers/columnController';
+import { AuthMiddleware } from '~/middlewares/authMiddleware';
+const Router = express.Router();
 
-const Router = express.Router()
-
-Router.route('/')
-  .post(columnValidation.createNew, columnController.createNew)
+Router.route('/').post(
+  AuthMiddleware.isAuthorized,
+  columnValidation.createNew,
+  columnController.createNew
+);
 
 Router.route('/:id')
-  .put(columnValidation.update, columnController.update)
-  .delete(columnValidation.deleteColumn, columnController.deleteColumn)
+  .put(
+    AuthMiddleware.isAuthorized,
+    columnValidation.update,
+    columnController.update
+  )
+  .delete(
+    AuthMiddleware.isAuthorized,
+    columnValidation.deleteColumn,
+    columnController.deleteColumn
+  );
 
-export const columnRoute = Router
+export const columnRoute = Router;
