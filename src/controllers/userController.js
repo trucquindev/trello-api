@@ -1,4 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
+import ms from 'ms';
 import { userService } from '~/services/userService';
 const createNew = async (req, res, next) => {
   try {
@@ -22,7 +23,19 @@ const login = async (req, res, next) => {
   try {
     // điều hướng dữ liệu sang service
     const result = await userService.login(req.body);
-    console.log('🚀 ~ login ~ result:', result);
+    // xu ly http only cookie
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('14 days'),
+    });
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('14 days'),
+    });
     res.status(StatusCodes.OK).json(result);
   } catch (error) {
     next(error);

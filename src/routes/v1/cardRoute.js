@@ -1,10 +1,13 @@
-import express from 'express'
-import { cardValidation } from '~/validations/cardValidation'
-import { cardController } from '~/controllers/cardController'
+import express from 'express';
+import { cardValidation } from '~/validations/cardValidation';
+import { cardController } from '~/controllers/cardController';
+import { AuthMiddleware } from '~/middlewares/authMiddleware';
+const Router = express.Router();
 
-const Router = express.Router()
+Router.route('/').post(
+  AuthMiddleware.isAuthorized,
+  cardValidation.createNew,
+  cardController.createNew
+);
 
-Router.route('/')
-  .post(cardValidation.createNew, cardController.createNew)
-
-export const cardRoute =Router
+export const cardRoute = Router;

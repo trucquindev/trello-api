@@ -3,15 +3,22 @@
 import express from 'express';
 import exitHook from 'async-exit-hook';
 import { env } from '~/config/environment';
-import { CONNECT_DB, GET_DB, CLOSE_DB } from '~/config/mongodb';
+import { CONNECT_DB, CLOSE_DB } from '~/config/mongodb';
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware';
 import { corsOptions } from './config/cors';
 import cors from 'cors';
 import { APIs_V1 } from './routes/v1';
+import cookieParser from 'cookie-parser';
 // import { mapOrder } from '~/utils/sorts.js'
 
 const START_SERVER = () => {
   const app = express();
+  // fix loi from disk cache cua ExpressJS
+  app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store');
+    next();
+  });
+  app.use(cookieParser());
   app.use(cors(corsOptions));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
