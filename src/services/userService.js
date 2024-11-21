@@ -121,8 +121,35 @@ const login = async (reqBody) => {
     throw error;
   }
 };
+const refreshToken = async (clientRefreshToken) => {
+  try {
+    // gia ma xem token co hop le khong
+    const refreshTokenDecoded = await JwtProvider.verifyToken(
+      clientRefreshToken,
+      env.REFRESH_TOKEN_SCRET_SIGNATURE
+    );
+
+    // chung ta luu thong tin unique va co dinh cua user trong token rooi vi vay co the lay luon tu decoded ra
+    const userInfo = {
+      _id: refreshTokenDecoded._id,
+      email: refreshTokenDecoded.email,
+    };
+
+    // Tao accres token moi
+    const accessToken = await JwtProvider.generateToken(
+      userInfo,
+      env.ACCESS_TOKEN_SCRET_SIGNATURE,
+      env.ACCESS_TOKEN_LIFE
+    );
+    return { accessToken };
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const userService = {
   createNew,
   verifyAccount,
   login,
+  refreshToken,
 };

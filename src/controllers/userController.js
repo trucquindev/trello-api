@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import ms from 'ms';
 import { userService } from '~/services/userService';
+import ApiError from '~/utils/ApiError';
 const createNew = async (req, res, next) => {
   try {
     // điều hướng dữ liệu sang service
@@ -28,7 +29,7 @@ const login = async (req, res, next) => {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      maxAge: ms('14 days'),
+      maxAge: ms('1h'),
     });
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
@@ -41,8 +42,42 @@ const login = async (req, res, next) => {
     next(error);
   }
 };
+const logout = async (req, res, next) => {
+  try {
+    // xoas cookie
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+
+    res.status(StatusCodes.OK).json({ loggedOut: true });
+  } catch (error) {
+    next(error);
+  }
+};
+const refreshToken = async (req, res, next) => {
+  try {
+    // điều hướng dữ liệu sang service
+    const result = await userService.refreshToken(req.cookies?.refreshToken);
+    // xu ly http only cookie
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('14 days'),
+    });
+    res.status(StatusCodes.OK).json(result);
+  } catch (error) {
+    next(
+      new ApiError(
+        StatusCodes.FORBIDDEN,
+        'Please sign in! (Error from refresh token)'
+      )
+    );
+  }
+};
 export const userController = {
   createNew,
   verifyAccount,
   login,
+  logout,
+  refreshToken,
 };
