@@ -34,7 +34,7 @@ const START_SERVER = () => {
       );
     });
   } else {
-    app.listen(env.LOCAL_DEV_APP_PORT, env.APP_HOST, () => {
+    app.listen(8017, env.APP_HOST, () => {
       // eslint-disable-next-line no-console
       console.log(
         `Hello ${env.AUTHOR}, I'm running at http://${env.LOCAL_DEV_APP_HOST}:${env.LOCAL_DEV_APP_PORT}/`
