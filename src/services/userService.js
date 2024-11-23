@@ -146,10 +146,48 @@ const refreshToken = async (clientRefreshToken) => {
     throw error;
   }
 };
+const update = async (userId, reqBody) => {
+  try {
+    //
+    const user = await userModel.findOneById(userId);
+    if (!user) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+    }
+    if (!user.isActive)
+      throw new ApiError(
+        StatusCodes.NOT_ACCEPTABLE,
+        'Your account is not active'
+      );
+    let updateUser = {
+      //
+    };
+    // truong hop change password
+    if (reqBody.current_password && reqBody.new_password) {
+      // kiem tra xem current password co dung hay khong
+      if (!bcryptjs.compareSync(reqBody.current_password, user.password)) {
+        throw new ApiError(
+          StatusCodes.NOT_ACCEPTABLE,
+          'Your current password is incorrect'
+        );
+      }
+      // hash new password
+      updateUser = await userModel.update(user._id, {
+        password: bcryptjs.hashSync(reqBody.new_password, 8),
+      });
+    } else {
+      // th update cac thong tin chung nhu displayName
+      updateUser = await userModel.update(user._id, reqBody);
+    }
+    return pickUser(updateUser);
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const userService = {
   createNew,
   verifyAccount,
   login,
   refreshToken,
+  update,
 };
