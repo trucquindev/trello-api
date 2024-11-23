@@ -1,6 +1,7 @@
 import express from 'express';
 import { userValidation } from '~/validations/userValidation';
 import { userController } from '~/controllers/userController';
+import { AuthMiddleware } from '~/middlewares/authMiddleware';
 const Router = express.Router();
 
 Router.route('/register').post(
@@ -14,4 +15,10 @@ Router.route('/verify').put(
 Router.route('/login').post(userValidation.login, userController.login);
 Router.route('/logout').delete(userController.logout);
 Router.route('/refresh_token').get(userController.refreshToken);
+Router.route('/update').put(
+  AuthMiddleware.isAuthorized,
+  userValidation.update,
+  userController.update
+);
+
 export const userRoute = Router;
