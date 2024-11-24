@@ -6,7 +6,7 @@ import {
   EMAIL_RULE_MESSAGE,
   PASSWORD_RULE,
   PASSWORD_RULE_MESSAGE,
-} from '../models/validators';
+} from '../utils/validators';
 
 const createNew = async (req, res, next) => {
   // bắt buộc phải validation ở be vì be là điểm cuối để lưu vào db nên phải đảm bảo về mặt dữ liệu

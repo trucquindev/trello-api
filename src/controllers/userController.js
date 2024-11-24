@@ -78,7 +78,12 @@ const update = async (req, res, next) => {
   try {
     // điều hướng dữ liệu sang service
     const userId = req.jwtDecoded._id;
-    const updatedUser = await userService.update(userId, req.body);
+    const userAvatarFile = req.file;
+    const updatedUser = await userService.update(
+      userId,
+      req.body,
+      userAvatarFile
+    );
     res.status(StatusCodes.OK).json(updatedUser);
   } catch (error) {
     next(error);
