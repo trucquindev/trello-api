@@ -8,6 +8,7 @@ import { WEBSITE_DOMAIN } from '~/utils/constants';
 import { BrevoProvider } from '~/providers/BrevoProvider';
 import { env } from '~/config/environment';
 import { JwtProvider } from '~/providers/JwtProvider';
+import { CloudinaryProvider } from '~/providers/CloudinaryProvider';
 const createNew = async (reqBody) => {
   try {
     // Kieemr tra xem email da ton tai chua
@@ -146,7 +147,7 @@ const refreshToken = async (clientRefreshToken) => {
     throw error;
   }
 };
-const update = async (userId, reqBody) => {
+const update = async (userId, reqBody, userAvatarFile) => {
   try {
     //
     const user = await userModel.findOneById(userId);
@@ -173,6 +174,16 @@ const update = async (userId, reqBody) => {
       // hash new password
       updateUser = await userModel.update(user._id, {
         password: bcryptjs.hashSync(reqBody.new_password, 8),
+      });
+    } else if (userAvatarFile) {
+      // truong hop upload leen cloud storage, (cloud binary)
+      const uploadResult = await CloudinaryProvider.streamUpload(
+        userAvatarFile.buffer,
+        'trello'
+      );
+      // luu lai url r day len db
+      updateUser = await userModel.update(user._id, {
+        avatar: uploadResult.secure_url,
       });
     } else {
       // th update cac thong tin chung nhu displayName
