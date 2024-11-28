@@ -5,6 +5,7 @@ import { GET_DB } from '~/config/mongodb';
 import { BOARD_TYPE } from '~/utils/constants';
 import { columnModel } from './columnModel';
 import { cardModel } from './cardModel';
+import { pagingSkipValue } from '~/utils/algorithms';
 //define collection (schema and name)
 
 const BOARD_COLLECTION_NAME = 'boards';
@@ -14,6 +15,14 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   description: Joi.string().required().min(3).max(256).trim().strict(),
   type: Joi.string().valid(BOARD_TYPE.PUBLIC, BOARD_TYPE.PRIVATE).required(),
   columnOrderIds: Joi.array()
+    .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
+    .default([]),
+  // nhung Admin cua boards
+  ownerIds: Joi.array()
+    .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
+    .default([]),
+  // nhung thanh vien cua boards
+  memberIds: Joi.array()
     .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
     .default([]),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
@@ -139,7 +148,78 @@ const updateBoard = async (boardId, updateData) => {
     throw new Error(error);
   }
 };
+const getAllBoards = async (userId, page, itemsPerPag) => {
+  try {
+    //get boards
+    // dieu kien de query ra boards
+    const queryCondition = [
+      { _destroy: false },
+      // no phai la thanh vien hoac admin cua board moi duoc select ra
+      {
+        $or: [
+          {
+            ownerIds: {
+              $all: [new ObjectId(userId)],
+            },
+          },
+          {
+            memberIds: {
+              $all: [new ObjectId(userId)],
+            },
+          },
+        ],
+      },
+    ];
+    const query = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .aggregate(
+        [
+          {
+            $match: { $and: queryCondition },
+          },
+          // sort title cuar board theo A-Z - theo chuan bang ma ASCII
+          {
+            $sort: { title: 1 },
+          },
+          // $facet xu ly nhieu luon trong 1 query
+          {
+            // https://www.mongodb.com/docs/v6.0/reference/operator/aggregation/facet/
+            $facet: {
+              //luong thu nhat: query boards
+              queryBoards: [
+                {
+                  $skip: pagingSkipValue(page, itemsPerPag), // boa di page truoc do da select
+                },
+                {
+                  $limit: itemsPerPag, // gio han so luong toi da so luong ban ghi tra ve trong 1 page
+                },
+              ],
+              // luong thu hai : query dem tong so luong bang ghi boards trong db va tra ve vao bien countedBoards ma userId nay co the select
+              queryTotalBoards: [
+                {
+                  $count: 'countedBoards',
+                },
+              ],
+            },
+          },
+        ],
+        // fix viec tra ve B hoa truoc a thuong
+        //https://www.mongodb.com/docs/v6.0/reference/collation/#std-label-collation-document-fields
+        {
+          collation: { locale: 'en' },
+        }
+      )
+      .toArray();
 
+    const res = query[0];
+    return {
+      boards: res.queryBoards || [],
+      totalBoards: res.queryTotalBoards[0]?.countedBoards || 0,
+    };
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -149,4 +229,5 @@ export const boardModel = {
   pushColumnOderIds,
   updateBoard,
   pullColumnOderIds,
+  getAllBoards,
 };

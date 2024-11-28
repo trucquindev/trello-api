@@ -4,11 +4,13 @@ import { boardController } from '~/controllers/boardController';
 import { AuthMiddleware } from '~/middlewares/authMiddleware';
 const Router = express.Router();
 
-Router.route('/').post(
-  AuthMiddleware.isAuthorized,
-  boardValidation.createNew,
-  boardController.createNew
-);
+Router.route('/')
+  .get(AuthMiddleware.isAuthorized, boardController.getAllBoards)
+  .post(
+    AuthMiddleware.isAuthorized,
+    boardValidation.createNew,
+    boardController.createNew
+  );
 Router.route('/:id')
   .get(AuthMiddleware.isAuthorized, boardController.getBoardDetails)
   .put(

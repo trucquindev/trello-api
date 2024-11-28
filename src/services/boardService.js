@@ -5,6 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 import { cloneDeep } from 'lodash';
 import { columnModel } from '~/models/columnModel';
 import { cardModel } from '~/models/cardModel';
+import { DEFAULT_PAGE, DEFAULT_ITEMS_PER_PAGE } from '~/utils/constants';
 const createNew = async (data) => {
   // eslint-disable-next-line no-useless-catch
   try {
@@ -89,10 +90,26 @@ const moveCardToDifferentColumn = async (reqBody) => {
     throw error;
   }
 };
+const getAllBoards = async (userId, page, itemsPerPage) => {
+  try {
+    // neu khong ton tai gia tri page hoac itemPerPage thi phai luon dat gia tri mac dinh
+    if (!page) page = DEFAULT_PAGE;
+    if (!itemsPerPage) itemsPerPage = DEFAULT_ITEMS_PER_PAGE;
 
+    const result = await boardModel.getAllBoards(
+      userId,
+      parseInt(page, 10),
+      parseInt(itemsPerPage, 10)
+    );
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
 export const boardService = {
   createNew,
   getBoardDetails,
   updatedBoardService,
   moveCardToDifferentColumn,
+  getAllBoards,
 };
