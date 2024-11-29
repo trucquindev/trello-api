@@ -13,9 +13,11 @@ const createNew = async (req, res, next) => {
 };
 const getBoardDetails = async (req, res, next) => {
   try {
+    const userId = req.jwtDecoded._id;
+
     const boardId = req.params.id;
     // điều hướng dữ liệu sang service
-    const getDetails = await boardService.getBoardDetails(boardId);
+    const getDetails = await boardService.getBoardDetails(userId, boardId);
 
     // trả về kết quả thành công
     res.status(StatusCodes.OK).json(getDetails);

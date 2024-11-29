@@ -27,11 +27,10 @@ const createNew = async (data) => {
     throw error;
   }
 };
-const getBoardDetails = async (boardId) => {
+const getBoardDetails = async (userId, boardId) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    //gọi tới model để lưu newboard vào database
-    const board = await boardModel.getDetails(boardId);
+    const board = await boardModel.getDetails(userId, boardId);
     if (!board) throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found');
     const resBoard = cloneDeep(board);
     // dua card ve dung column cua no

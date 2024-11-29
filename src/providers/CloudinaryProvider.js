@@ -13,10 +13,10 @@ cloudinaryV2.config({
   api_secret: env.CLOUDINARY_API_SECRET,
 });
 // khoi tao 1 function de upload fule leen cloud
-const streamUpload = (fileBuffer, folerName) => {
+const streamUpload = (fileBuffer, folderName) => {
   return new Promise((resolve, reject) => {
     let stream = cloudinaryV2.uploader.upload_stream(
-      { folder: folerName },
+      { folder: folderName },
       (error, result) => {
         if (result) {
           resolve(result);

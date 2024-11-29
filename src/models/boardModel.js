@@ -55,17 +55,33 @@ const findOneById = async (boardId) => {
 };
 // dung query tong hop(aggregate) de lay toan bo columns va card thuoc ve board
 // https://www.mongodb.com/docs/manual/reference/operator/aggregation/lookup/
-const getDetails = async (boardId) => {
+const getDetails = async (userId, boardId) => {
   try {
-    // return await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({ _id: new ObjectId(boardId) })
+    // dieu kien de query ra boards
+    const queryCondition = [
+      { _id: new ObjectId(boardId) },
+      { _destroy: false },
+      // no phai la thanh vien hoac admin cua board moi duoc select ra
+      {
+        $or: [
+          {
+            ownerIds: {
+              $all: [new ObjectId(userId)],
+            },
+          },
+          {
+            memberIds: {
+              $all: [new ObjectId(userId)],
+            },
+          },
+        ],
+      },
+    ];
     const result = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .aggregate([
         {
-          $match: {
-            _id: new ObjectId(boardId),
-            _destroy: false,
-          },
+          $match: { $and: queryCondition },
         },
         {
           $lookup: {
