@@ -6,7 +6,7 @@ import { cloneDeep } from 'lodash';
 import { columnModel } from '~/models/columnModel';
 import { cardModel } from '~/models/cardModel';
 import { DEFAULT_PAGE, DEFAULT_ITEMS_PER_PAGE } from '~/utils/constants';
-const createNew = async (data) => {
+const createNew = async (userId, data) => {
   // eslint-disable-next-line no-useless-catch
   try {
     const newBoard = {
@@ -17,7 +17,7 @@ const createNew = async (data) => {
     };
 
     //gọi tới model để lưu newboard vào database
-    const createdNew = await boardModel.createNew(newBoard);
+    const createdNew = await boardModel.createNew(userId, newBoard);
 
     const getBoardCreated = await boardModel.findOneById(createdNew.insertedId);
     //trả kết quả về, trong service phải return nếu không thì có như không có

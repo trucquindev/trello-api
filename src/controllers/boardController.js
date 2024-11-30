@@ -2,8 +2,10 @@ import { StatusCodes } from 'http-status-codes';
 import { boardService } from '~/services/boardService';
 const createNew = async (req, res, next) => {
   try {
+    const userId = req.jwtDecoded._id;
+
     // điều hướng dữ liệu sang service
-    const creatNewBoard = await boardService.createNew(req.body);
+    const creatNewBoard = await boardService.createNew(userId, req.body);
 
     // trả về kết quả thành công
     res.status(StatusCodes.CREATED).json(creatNewBoard);
