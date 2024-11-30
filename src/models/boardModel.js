@@ -32,14 +32,18 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
 // chi dinh nhung field k muon cap nhat
 const INVALID_UPDATE_FIELDS = ['_id', 'createdAt'];
 
-const createNew = async (data) => {
+const createNew = async (userId, data) => {
   try {
     const validData = await BOARD_COLLECTION_SCHEMA.validateAsync(data, {
       abortEarly: true,
     });
+    const newBoardToAdd = {
+      ...validData,
+      ownerIds: [new ObjectId(userId)],
+    };
     return await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
-      .insertOne(validData);
+      .insertOne(newBoardToAdd);
   } catch (error) {
     throw new Error(error);
   }
