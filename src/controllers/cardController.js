@@ -15,11 +15,13 @@ const update = async (req, res, next) => {
   try {
     const cardId = req.params.id;
     const cardCoverFile = req.file;
+    const userInfo = req.jwtDecoded;
     // điều hướng dữ liệu sang service
     const updateCard = await cardService.update(
       cardId,
       req.body,
-      cardCoverFile
+      cardCoverFile,
+      userInfo
     );
 
     // trả về kết quả thành công

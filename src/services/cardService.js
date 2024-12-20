@@ -18,7 +18,7 @@ const createNew = async (data) => {
     throw error;
   }
 };
-const update = async (cardId, data, cardCoverFile) => {
+const update = async (cardId, data, cardCoverFile, userInfo) => {
   try {
     const updateCardData = {
       ...data,
@@ -37,6 +37,15 @@ const update = async (cardId, data, cardCoverFile) => {
       updatedCard = await cardModel.update(cardId, {
         cover: uploadResult.secure_url,
       });
+    } else if (updateCardData.commentToAdd) {
+      // them comment vao card
+      const commentData = {
+        ...updateCardData.commentToAdd,
+        userId: userInfo._id,
+        userEmail: userInfo.email,
+        commentedAt: Date.now(),
+      };
+      updatedCard = await cardModel.unshiftNewComment(cardId, commentData);
     } else {
       // cac truong hop update nhu title, description ...
       updatedCard = await cardModel.update(cardId, updateCardData);
