@@ -102,6 +102,27 @@ const deleteAllByColumnId = async (columnId) => {
     throw new Error(error);
   }
 };
+
+/**
+ * ĐẨY MỘT PHẦN TỬ COMMENT VÀO ĐẦU MẢNG COMMENTS
+ * - TRONG JS, NGƯỢC LẠI VỚI PUSH (THÊM PHẦN TỬ VÀO CUỐI MẢNG) SẼ LÀ UNSHIFT( THÊM VÀO ĐẦU MẢNG)
+ * - NHƯNG TRONG MONGO THI HIEN TAI CHI CÓ PUSH - MAC DINH VAO CUOI MANG
+ * ĐỂ THÊM VÀO ĐẦU: VẪN DÙNG $PUSH , NHƯNG BỌC DATA VÀO ARRAY ĐỂ TTRONG $EACH VA CHI DINH $POSITION: 0
+ */
+const unshiftNewComment = async (cardId, commentData) => {
+  try {
+    const result = await GET_DB()
+      .collection(CARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(cardId) },
+        { $push: { comments: { $each: [commentData], $position: 0 } } },
+        { returnDocument: 'after' }
+      );
+    return result;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
@@ -109,4 +130,5 @@ export const cardModel = {
   findOneById,
   update,
   deleteAllByColumnId,
+  unshiftNewComment,
 };
