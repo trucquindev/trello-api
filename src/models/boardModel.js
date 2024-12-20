@@ -6,6 +6,7 @@ import { BOARD_TYPE } from '~/utils/constants';
 import { columnModel } from './columnModel';
 import { cardModel } from './cardModel';
 import { pagingSkipValue } from '~/utils/algorithms';
+import { userModel } from './userModel';
 //define collection (schema and name)
 
 const BOARD_COLLECTION_NAME = 'boards';
@@ -101,6 +102,26 @@ const getDetails = async (userId, boardId) => {
             localField: '_id',
             foreignField: 'boardId',
             as: 'cards',
+          },
+        },
+        {
+          $lookup: {
+            from: userModel.USER_COLLECTION_NAME,
+            localField: 'ownerIds',
+            foreignField: '_id',
+            as: 'owners',
+            // pipeline trong lookup la de xu ly mot hoac nhiue luong can thiet
+            //$project de chi dinh va field khong muon lay ve bang cach gan gia tri no bang khong
+            pipeline: [{ $project: { password: 0, verifyToken: 0 } }],
+          },
+        },
+        {
+          $lookup: {
+            from: userModel.USER_COLLECTION_NAME,
+            localField: 'memberIds',
+            foreignField: '_id',
+            as: 'members',
+            pipeline: [{ $project: { password: 0, verifyToken: 0 } }],
           },
         },
       ])

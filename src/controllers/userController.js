@@ -79,7 +79,6 @@ const update = async (req, res, next) => {
     // điều hướng dữ liệu sang service
     const userId = req.jwtDecoded._id;
     const userAvatarFile = req.file;
-    console.log('🚀 ~ update ~ userAvatarFile:', userAvatarFile);
     const updatedUser = await userService.update(
       userId,
       req.body,
