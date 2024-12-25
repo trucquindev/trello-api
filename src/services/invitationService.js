@@ -49,6 +49,16 @@ const createNewBoardInvitation = async (data, inviterId) => {
     throw error;
   }
 };
+const getInvitations = async (userId) => {
+  try {
+    const invitations = await invitationModel.getInvitationsByUserId(userId);
+    console.log('🚀 ~ getInvitations ~ invitations:', invitations);
+    return invitations;
+  } catch (error) {
+    throw error;
+  }
+};
 export const invitationService = {
   createNewBoardInvitation,
+  getInvitations,
 };
