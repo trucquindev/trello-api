@@ -148,7 +148,6 @@ const pushColumnOderIds = async (dataColumn) => {
     throw new Error(error);
   }
 };
-
 // lay mot phan tu columnId ra khoi mang columnOderIds
 //dung pull trong mongodb de lay 1 phan tu di
 const pullColumnOderIds = async (dataColumn) => {
@@ -261,6 +260,21 @@ const getAllBoards = async (userId, page, itemsPerPag) => {
     throw new Error(error);
   }
 };
+const pushMemberIds = async (boardId, memberId) => {
+  try {
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(boardId) },
+        { $push: { memberIds: new ObjectId(memberId) } },
+        { returnDocument: 'after' }
+      );
+    return result;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -271,4 +285,5 @@ export const boardModel = {
   updateBoard,
   pullColumnOderIds,
   getAllBoards,
+  pushMemberIds,
 };
