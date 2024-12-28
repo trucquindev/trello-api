@@ -14,4 +14,8 @@ Router.route('/').get(
   invitationController.getInvitations
 );
 
+Router.route('/board/:invitationId').put(
+  AuthMiddleware.isAuthorized,
+  invitationController.updateBoardInvitation
+);
 export const invitationRoute = Router;
