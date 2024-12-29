@@ -9,8 +9,9 @@ import { corsOptions } from './config/cors';
 import cors from 'cors';
 import { APIs_V1 } from './routes/v1';
 import cookieParser from 'cookie-parser';
-// import { mapOrder } from '~/utils/sorts.js'
-
+import socketIo from 'socket.io';
+import http from 'http';
+import { inviteUserToBoardSocket } from './sockets/inviteUserToBoardSocket';
 const START_SERVER = () => {
   const app = express();
   // fix loi from disk cache cua ExpressJS
@@ -26,15 +27,24 @@ const START_SERVER = () => {
 
   //middleware xu li loi tap trung
   app.use(errorHandlingMiddleware);
+
+  // tao 1 server som de boc thang app cua express de lam realtime voi socketid
+  const server = http.createServer(app);
+  // khoi tao bien io voi server va cors
+  const io = socketIo(server, { cors: corsOptions });
+  io.on('connection', (socket) => {
+    inviteUserToBoardSocket(socket);
+  });
+
   if (env.BUILD_MODE === 'prod') {
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       // eslint-disable-next-line no-console
       console.log(
         `Production. Hello ${env.AUTHOR}, I'm running at Port: ${process.env.PORT}`
       );
     });
   } else {
-    app.listen(8017, env.APP_HOST, () => {
+    server.listen(8017, env.APP_HOST, () => {
       // eslint-disable-next-line no-console
       console.log(
         `Hello ${env.AUTHOR}, I'm running at http://${env.LOCAL_DEV_APP_HOST}:${env.LOCAL_DEV_APP_PORT}/`
