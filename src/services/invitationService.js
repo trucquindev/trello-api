@@ -109,7 +109,7 @@ const updateBoardInvitation = async (userId, invitationId, status) => {
       BOARD_INVITATION_STATUS.ACCEPTED
     ) {
       await boardModel.pushMemberIds(
-        updateBoardInvitation.boardInvitation.boardId,
+        updatedInvitation.boardInvitation.boardId.toString(),
         userId
       );
     }
