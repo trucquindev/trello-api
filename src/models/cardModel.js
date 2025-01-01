@@ -7,6 +7,7 @@ import {
 } from '../utils/validators';
 import { GET_DB } from '~/config/mongodb';
 import { ObjectId } from 'mongodb';
+import { CARD_MEMBER_ACTION } from '~/utils/constants';
 // Define Collection (name & schema)
 const CARD_COLLECTION_NAME = 'cards';
 const CARD_COLLECTION_SCHEMA = Joi.object({
@@ -123,6 +124,36 @@ const unshiftNewComment = async (cardId, commentData) => {
     throw new Error(error);
   }
 };
+
+const updateMembers = async (cardId, incomingMemberInfor) => {
+  try {
+    // tạo ra biến updateCondition ban đầu là rỗng
+    let updateCondition = {};
+
+    // nếu mảng memberIds của cardId đã tồn tại và có thay đ��i
+    if (incomingMemberInfor.action === CARD_MEMBER_ACTION.ADD) {
+      updateCondition = {
+        $push: { memberIds: new ObjectId(incomingMemberInfor.userId) },
+      };
+    }
+    if (incomingMemberInfor.action === CARD_MEMBER_ACTION.REMOVE) {
+      updateCondition = {
+        $pull: { memberIds: new ObjectId(incomingMemberInfor.userId) },
+      }
+    }
+    const result = await GET_DB()
+      .collection(CARD_COLLECTION_NAME)
+      .findOneAndUpdate({ _id: new ObjectId(cardId) }, updateCondition, {
+        returnDocument: 'after',
+      });
+    return result;
+
+    // nếu có điều kiện update thì cập nhật
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
@@ -131,4 +162,5 @@ export const cardModel = {
   update,
   deleteAllByColumnId,
   unshiftNewComment,
+  updateMembers,
 };
