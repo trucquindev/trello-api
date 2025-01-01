@@ -46,6 +46,12 @@ const update = async (cardId, data, cardCoverFile, userInfo) => {
         commentedAt: Date.now(),
       };
       updatedCard = await cardModel.unshiftNewComment(cardId, commentData);
+    } else if (updateCardData.incomingMemberInfor) {
+      // th add hoặc remove thành viên ra khỏi card
+      updatedCard = await cardModel.updateMembers(
+        cardId,
+        updateCardData.incomingMemberInfor
+      );
     } else {
       // cac truong hop update nhu title, description ...
       updatedCard = await cardModel.update(cardId, updateCardData);
