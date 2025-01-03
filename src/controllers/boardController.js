@@ -57,9 +57,17 @@ const getAllBoards = async (req, res, next) => {
   try {
     const userId = req.jwtDecoded._id;
     //page ve itemsPerPage duoc truyen vao trong query url tu phia fe nen be se lay thong qua query
-    const { page, itemsPerPage } = req.query;
+    const { page, itemsPerPage, q } = req.query;
+    const queryFilter = q;
+    // console.log('🚀 ~ getAllBoards ~ queryFilter:', queryFilter);
+
     // điều hướng dữ liệu sang service
-    const results = await boardService.getAllBoards(userId, page, itemsPerPage);
+    const results = await boardService.getAllBoards(
+      userId,
+      page,
+      itemsPerPage,
+      queryFilter
+    );
 
     // trả về kết quả thành công
     res.status(StatusCodes.OK).json(results);

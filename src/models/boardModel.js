@@ -188,7 +188,7 @@ const updateBoard = async (boardId, updateData) => {
     throw new Error(error);
   }
 };
-const getAllBoards = async (userId, page, itemsPerPag) => {
+const getAllBoards = async (userId, page, itemsPerPag, queryFilter) => {
   try {
     //get boards
     // dieu kien de query ra boards
@@ -210,6 +210,21 @@ const getAllBoards = async (userId, page, itemsPerPag) => {
         ],
       },
     ];
+    // xu ly query filter cho tung truong hop nhu searchBoard, vi du search theo title
+    if (queryFilter) {
+      Object.keys(queryFilter).forEach((key) => {
+        // Có phân biệt chữ hoa chữ thường
+        // queryCondition.push({
+        //   [key]: { $regex: queryFilter[key] },
+        // });
+        // không phân biệt chữ hoa chữ thường
+        queryCondition.push({
+          [key]: { $regex: new RegExp(queryFilter[key], 'i') },
+        });
+      });
+    }
+    // tinh toan voi page va itemsPerPag de tinh skip value
+    const pagingSkipValue = (page, itemsPerPag) => (page - 1) * itemsPerPag;
     const query = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .aggregate(
